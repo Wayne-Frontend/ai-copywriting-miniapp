@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="言序">
+  <defs>
+    <linearGradient id="yanxu-bg" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#328CF2" />
+      <stop offset="1" stop-color="#5056D7" />
+    </linearGradient>
+    <linearGradient id="yanxu-ink" x1="18" y1="20" x2="47" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#E9EEFF" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="17" fill="url(#yanxu-bg)" />
+  <path d="M9 23C19 9 39 7 55 18" fill="none" stroke="#FFFFFF" stroke-opacity=".16" stroke-width="1.5" />
+  <path d="M17 54C29 60 47 55 55 43" fill="none" stroke="#FFFFFF" stroke-opacity=".13" stroke-width="1.5" />
+  <path d="m32 10 2.8 3.8L32 17.6l-2.8-3.8L32 10Z" fill="#FCE3A7" />
+  <g fill="none" stroke="url(#yanxu-ink)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 22.5h28" stroke-width="4" />
+    <path d="M23 30.5h18M23 38h18" stroke-width="3.6" />
+    <path d="M24 45.5h16v7H24z" stroke-width="3.6" />
+  </g>
+</svg>

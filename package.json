@@ -1,0 +1,20 @@
+{
+  "name": "ai-copywriting-miniapp",
+  "private": true,
+  "scripts": {
+    "contracts:check": "tsc --noEmit -p packages/contracts/tsconfig.json",
+    "db:validate": "prisma validate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/migrate-local.ps1",
+    "templates:seed:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/seed-templates-local.ps1",
+    "api:start:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-api-local.ps1",
+    "admin:create:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-admin-local.ps1",
+    "admin:login:check:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-admin-login-local.ps1",
+    "admin:dev": "pnpm --filter @ai-copywriting/admin dev",
+    "admin:build": "pnpm --filter @ai-copywriting/admin build"
+  },
+  "devDependencies": {
+    "prisma": "7.10.1",
+    "typescript": "5.9.3"
+  }
+}
