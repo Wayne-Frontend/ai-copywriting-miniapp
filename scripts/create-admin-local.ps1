@@ -1,16 +1,16 @@
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'read-local-env.ps1')
+$localEnv = Read-ProjectLocalEnv -ProjectRoot $projectRoot
 $entry = Join-Path $projectRoot 'apps\api\scripts\create-admin.cjs'
 $apiProject = Join-Path $projectRoot 'apps\api\tsconfig.json'
 $typescriptCli = Join-Path $projectRoot 'node_modules\typescript\bin\tsc'
 
-$secureDbPassword = Read-Host -Prompt 'PostgreSQL password for ai_copywriting_dev' -AsSecureString
-$escapedDbPassword = [Uri]::EscapeDataString([System.Net.NetworkCredential]::new('', $secureDbPassword).Password)
-Remove-Variable secureDbPassword
-$secureMfaKey = Read-Host -Prompt 'ADMIN_MFA_KEY (same value used to start API)' -AsSecureString
-$mfaKey = [System.Net.NetworkCredential]::new('', $secureMfaKey).Password
-Remove-Variable secureMfaKey
+$databasePassword = Get-ProjectLocalSecret -Settings $localEnv -Name 'POSTGRES_PASSWORD' -Prompt 'PostgreSQL password for ai_copywriting_dev'
+$escapedDbPassword = [Uri]::EscapeDataString($databasePassword)
+Remove-Variable databasePassword
+$mfaKey = Get-ProjectLocalSecret -Settings $localEnv -Name 'ADMIN_MFA_KEY' -Prompt 'ADMIN_MFA_KEY (same value used to start API)'
 $username = Read-Host -Prompt 'First admin username (lowercase)'
 $secureAdminPassword = Read-Host -Prompt 'First admin password (at least 12 characters)' -AsSecureString
 $adminPassword = [System.Net.NetworkCredential]::new('', $secureAdminPassword).Password

@@ -1,16 +1,16 @@
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'read-local-env.ps1')
+$localEnv = Read-ProjectLocalEnv -ProjectRoot $projectRoot
 $prismaCli = Join-Path $projectRoot 'node_modules\prisma\build\index.js'
 if (-not (Test-Path -LiteralPath $prismaCli)) {
     throw 'Prisma is not installed. Run pnpm install first.'
 }
 
-$securePassword = Read-Host -Prompt 'PostgreSQL password for ai_copywriting_dev' -AsSecureString
-$escapedPassword = [Uri]::EscapeDataString(
-    [System.Net.NetworkCredential]::new('', $securePassword).Password
-)
-Remove-Variable securePassword
+$databasePassword = Get-ProjectLocalSecret -Settings $localEnv -Name 'POSTGRES_PASSWORD' -Prompt 'PostgreSQL password for ai_copywriting_dev'
+$escapedPassword = [Uri]::EscapeDataString($databasePassword)
+Remove-Variable databasePassword
 
 # 仅为本次迁移设置数据库地址；密码不写入项目文件或命令历史。
 $previousDatabaseUrl = [Environment]::GetEnvironmentVariable('DATABASE_URL', 'Process')

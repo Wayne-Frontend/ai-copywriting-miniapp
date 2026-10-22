@@ -15,7 +15,7 @@
 
 ## 本地启动（Windows）
 
-准备 Node.js 24、pnpm 和 PostgreSQL 18。以下脚本默认连接本机 `localhost:5432`，使用 `postgres` 用户和 `ai_copywriting_dev` 数据库；执行脚本时会提示输入数据库密码，密码不会写入仓库。
+准备 Node.js 24、pnpm 和 PostgreSQL 18。以下脚本默认连接本机 `localhost:5432`，使用 `postgres` 用户和 `ai_copywriting_dev` 数据库。
 
 1. 创建空数据库 `ai_copywriting_dev`，并安装依赖：
 
@@ -23,7 +23,9 @@
    pnpm install
    ```
 
-2. 将 `apps/admin/.env.example` 复制为 `apps/admin/.env`。按本机情况调整 `VITE_PORT` 和 API 代理地址。`.env` 是本地配置，已被 Git 忽略。
+2. 将项目根目录的 `.env.local.example` 复制为 `.env.local`，填入 `POSTGRES_PASSWORD`、`ADMIN_MFA_KEY` 和需要时使用的 `DASHSCOPE_API_KEY`。文件必须使用 UTF-8，逐行写 `KEY=value`；值可以用成对的单引号或双引号包裹，等号旁不要留空格。数据库密码填原文，脚本会自动对连接地址编码。`DASHSCOPE_BASE_URL` 和 `DASHSCOPE_MODEL` 可留空，分别使用北京地域兼容接口和 `qwen-plus`。根目录 `.env.local` 已被 Git 忽略；不要把密钥写进前端的 `apps/admin/.env`。
+
+   将 `apps/admin/.env.example` 复制为 `apps/admin/.env`，按本机情况调整 `VITE_PORT` 和 API 代理地址。这个文件只放前端配置，也已被 Git 忽略。
 
 3. 执行迁移并导入模板目录：
 
@@ -32,7 +34,7 @@
    pnpm run templates:seed:local
    ```
 
-4. 生成并妥善保存一个 **32 字节 Base64** 管理员 MFA 加密密钥。创建管理员和每次启动 API 时，都输入同一个 `ADMIN_MFA_KEY`；丢失该密钥会影响已配置 MFA 的管理员登录。
+4. 首次创建管理员时生成一个 **32 字节 Base64** 管理员 MFA 加密密钥，填入根目录 `.env.local` 的 `ADMIN_MFA_KEY`。如果已经创建过管理员，必须填入此前使用的同一个密钥，不要重新生成；更换或丢失该密钥会影响已配置 MFA 的管理员登录。
 
    ```powershell
    node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('base64'))"
@@ -50,6 +52,8 @@
    ```
 
    API 默认地址为 `http://127.0.0.1:3000`，管理后台默认地址为 `http://127.0.0.1:3006`。可用 `http://127.0.0.1:3000/health/ready` 检查 API 与数据库连接。
+
+   API 从 `.env.local` 读取百炼配置。`DASHSCOPE_API_KEY` 应与所选地域匹配；留空时不能运行模型测试。脚本只把密钥传给当前 API 子进程，不会传给管理后台。请根据[百炼 Base URL 文档](https://help.aliyun.com/zh/model-studio/base-url)核对地域和业务空间地址。测试调用会产生模型费用，但不会扣除普通用户额度。
 
 ## 常用检查
 
