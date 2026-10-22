@@ -9,6 +9,8 @@ export interface AdminIdentity {
   id: string;
   username: string;
   role: string;
+  email?: string | null;
+  avatarKey?: string | null;
 }
 
 interface AdminRow extends AdminIdentity {
@@ -72,7 +74,8 @@ export class AdminAuthService implements OnModuleDestroy {
       if (accountLimited || ipLimited) return 'limited';
 
       const result = await client.query<AdminRow>(
-        `SELECT id, username, role, status, password_hash, mfa_secret_ciphertext, last_totp_step
+        `SELECT id, username, role, status, email, avatar_key AS "avatarKey",
+                password_hash, mfa_secret_ciphertext, last_totp_step
          FROM admin_users WHERE username = $1`,
         [normalized],
       );
@@ -106,7 +109,8 @@ export class AdminAuthService implements OnModuleDestroy {
       );
       await client.query('DELETE FROM admin_login_limits WHERE key = $1', [accountKey]);
       await client.query('COMMIT');
-      return { identity: { id: admin.id, username: admin.username, role: admin.role }, token };
+      return { identity: { id: admin.id, username: admin.username, role: admin.role,
+        email: admin.email ?? null, avatarKey: admin.avatarKey ?? null }, token };
       } catch (error) {
         await client.query('ROLLBACK');
         throw error;
@@ -119,7 +123,7 @@ export class AdminAuthService implements OnModuleDestroy {
   async session(token: string | undefined): Promise<AdminIdentity | null> {
     if (!token) return null;
     const result = await this.pool.query<AdminIdentity>(
-      `SELECT a.id, a.username, a.role FROM admin_sessions s
+      `SELECT a.id, a.username, a.role, a.email, a.avatar_key AS "avatarKey" FROM admin_sessions s
        JOIN admin_users a ON a.id = s.admin_user_id
        WHERE s.token_hash = $1 AND s.revoked_at IS NULL AND s.expires_at > NOW()
          AND a.status = 'active'`,

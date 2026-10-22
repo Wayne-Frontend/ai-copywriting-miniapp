@@ -15,6 +15,8 @@ export interface AdminIdentity {
   id: string;
   username: string;
   role: string;
+  email?: string | null;
+  avatarKey?: string | null;
 }
 
 export interface AdminLoginRequest {
@@ -35,6 +37,24 @@ export interface AdminTemplateListItem {
   updatedByUsername: string | null;
 }
 
+export interface AdminPublishedTemplateVersion {
+  version: number;
+  isCurrent: boolean;
+  model: string | null;
+  changeLog: string;
+  publishedAt: string | null;
+  publishedByUsername: string | null;
+}
+
+export interface AdminPublishedTemplateVersionDetail extends AdminPublishedTemplateVersion {
+  description?: string | null;
+  systemPromptVersion: string;
+  developerPrompt: string;
+  formSchema: unknown;
+  outputSchema: unknown;
+  modelConfig: Record<string, unknown>;
+}
+
 export interface AdminTemplateDraft {
   template: { code: string; name: string; description: string; status: string };
   version: number;
@@ -48,6 +68,87 @@ export interface SaveTemplateDraftInput {
   developerPrompt: string;
   changeLog: string;
   revision: string | null;
+}
+
+export interface PublishTemplateDraftInput {
+  revision: string;
+}
+
+export interface PublishTemplateResult {
+  version: number;
+  status: 'active';
+  publishedAt: string;
+  model: string;
+}
+
+export interface ChangeTemplateAvailabilityInput {
+  status: 'active' | 'disabled';
+  expectedStatus: 'active' | 'disabled';
+  expectedVersion: number;
+}
+
+export interface ChangeTemplateAvailabilityResult {
+  status: 'active' | 'disabled';
+  currentVersion: number;
+  updatedAt: string;
+}
+
+export interface RollbackTemplateVersionInput {
+  expectedCurrentVersion: number;
+  expectedStatus: 'active' | 'disabled';
+  reason: string;
+}
+
+export interface RollbackTemplateVersionResult {
+  previousVersion: number;
+  currentVersion: number;
+  status: 'active' | 'disabled';
+  updatedAt: string;
+}
+
+export interface ManagedTemplateDraft {
+  code: string;
+  name: string;
+  status: 'active' | 'disabled';
+  version: number;
+  description: string;
+  developerPrompt: string;
+  changeLog: string;
+  formSchema: unknown;
+  outputSchema: unknown;
+  maxOutputTokens: number;
+  testCases: Record<string, unknown>[];
+  evaluation: { results: Record<string, { passed: boolean; output: unknown; model: string; durationMs: number }>;
+    approvedBy?: string; approvedAt?: string; note?: string } | null;
+  revision: string | null;
+  saved: boolean;
+}
+
+export type SaveManagedTemplateDraftInput = Pick<ManagedTemplateDraft,
+  'description' | 'developerPrompt' | 'changeLog' | 'formSchema' | 'outputSchema' |
+  'maxOutputTokens' | 'testCases' | 'revision'>;
+
+export interface ManagedTemplateTestResult {
+  index: number;
+  output: unknown;
+  model: string;
+  durationMs: number;
+  completed: number;
+  total: number;
+}
+
+export interface AdminXhsTitleTestRequest {
+  revision: string;
+  inputs: TemplateInputs<'XHS_TITLE'>;
+}
+
+export interface AdminXhsTitleTestResult {
+  version: number;
+  revision: string;
+  model: string;
+  durationMs: number;
+  tokenUsage: { input: number; output: number; total: number } | null;
+  items: TemplateOutputMap['XHS_TITLE']['items'];
 }
 
 // 仅登记 PRD 已列出的用户端路径；支付通知和管理端细节待对应业务契约明确后添加。

@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "test:template": "tsc -p tsconfig.json && node --test test/*.test.cjs"
   },
   "dependencies": {
     "@fastify/cookie": "11.1.3",

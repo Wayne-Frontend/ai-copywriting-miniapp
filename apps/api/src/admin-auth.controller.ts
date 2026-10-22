@@ -1,6 +1,7 @@
-import { Body, Controller, Get, HttpCode, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Patch, Post, Req, Res } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { AdminAuthService, type AdminIdentity } from './admin-auth.service';
+import { AdminUserError, AdminUsersService, parseProfile } from './admin-users.service';
 
 const COOKIE_NAME = process.env.NODE_ENV === 'production' ? '__Host-admin_session' : 'admin_session';
 const SECURE_COOKIE = process.env.NODE_ENV === 'production';
@@ -27,7 +28,18 @@ function failure(reply: AdminReply, status: number, code: string, message: strin
 
 @Controller('api/admin/v1/auth')
 export class AdminAuthController {
-  constructor(private readonly auth: AdminAuthService) {}
+  constructor(private readonly auth: AdminAuthService, private readonly users: AdminUsersService) {}
+
+  private async current(request: AdminRequest, reply: AdminReply, requestId: string): Promise<AdminIdentity | null> {
+    const identity = await this.auth.session(request.cookies[COOKIE_NAME]);
+    if (!identity) failure(reply, 401, 'AUTH_REQUIRED', '管理会话已失效，请重新登录', requestId);
+    return identity;
+  }
+
+  private userError(reply: AdminReply, error: unknown, requestId: string) {
+    if (error instanceof AdminUserError) failure(reply, error.status, error.code, error.message, requestId);
+    else failure(reply, 503, 'SERVICE_UNAVAILABLE', '管理员资料暂时不可用', requestId);
+  }
 
   @Get('csrf')
   csrf(@Res({ passthrough: true }) reply: AdminReply): Envelope<{ csrfToken: string }> {
@@ -102,5 +114,45 @@ export class AdminAuthController {
     reply.clearCookie(COOKIE_NAME, { path: '/' });
     reply.header('Cache-Control', 'no-store');
     return success(null, randomUUID());
+  }
+
+  @Get('me/profile')
+  async profile(@Req() request: AdminRequest, @Res({ passthrough: true }) reply: AdminReply) {
+    const id = randomUUID(); reply.header('Cache-Control', 'no-store');
+    try {
+      const identity = await this.current(request, reply, id); if (!identity) return;
+      return success(await this.users.me(identity.id), id);
+    } catch (error) { this.userError(reply, error, id); }
+  }
+
+  @Patch('me/profile')
+  async updateProfile(@Body() body: unknown, @Req() request: AdminRequest,
+    @Res({ passthrough: true }) reply: AdminReply) {
+    const id = randomUUID(); reply.header('Cache-Control', 'no-store');
+    try {
+      const identity = await this.current(request, reply, id); if (!identity) return;
+      return success(await this.users.updateProfile(identity.id, parseProfile(body),
+        identity.id, id, request.ip), id);
+    } catch (error) { this.userError(reply, error, id); }
+  }
+
+  @Post('me/password')
+  @HttpCode(200)
+  async changePassword(@Body() body: unknown, @Req() request: AdminRequest,
+    @Res({ passthrough: true }) reply: AdminReply) {
+    const id = randomUUID(); reply.header('Cache-Control', 'no-store');
+    try {
+      const identity = await this.current(request, reply, id); if (!identity) return;
+      if (!body || typeof body !== 'object' || Array.isArray(body) ||
+        Object.keys(body).sort().join(',') !== 'newPassword,oldPassword,totp' ||
+        !('oldPassword' in body) || typeof body.oldPassword !== 'string' ||
+        !('newPassword' in body) || typeof body.newPassword !== 'string' ||
+        !('totp' in body) || typeof body.totp !== 'string') {
+        failure(reply, 400, 'VALIDATION_ERROR', '密码参数不正确', id); return;
+      }
+      await this.users.changeOwnPassword(identity.id, body.oldPassword, body.newPassword,
+        body.totp, id, request.ip);
+      return success(null, id);
+    } catch (error) { this.userError(reply, error, id); }
   }
 }

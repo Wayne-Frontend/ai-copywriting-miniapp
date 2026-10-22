@@ -58,6 +58,17 @@ model UserConsent {
 model AdminUser {
   id                  String            @id @default(uuid()) @db.Uuid
   username            String            @unique @db.VarChar(80)
+  nickname            String?           @db.VarChar(80)
+  realName            String?           @map("real_name") @db.VarChar(80)
+  gender              String?           @db.VarChar(8)
+  phone               String?           @db.VarChar(20)
+  email               String?           @db.VarChar(254)
+  department          String?           @db.VarChar(80)
+  avatarKey           String?           @map("avatar_key") @db.VarChar(20)
+  address             String?           @db.VarChar(200)
+  bio                 String?           @db.VarChar(500)
+  createdBy           String?           @map("created_by") @db.Uuid
+  updatedBy           String?           @map("updated_by") @db.Uuid
   passwordHash        String            @map("password_hash") @db.Text
   mfaSecretCiphertext String            @map("mfa_secret_ciphertext") @db.Text
   role                String            @db.VarChar(24)
