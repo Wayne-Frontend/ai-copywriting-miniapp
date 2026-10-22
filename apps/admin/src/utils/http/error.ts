@@ -136,6 +136,14 @@ export function handleError(error: AxiosError<unknown>): never {
   const contractError = isApiError(responseData) ? responseData : null
   const requestConfig = error.config
 
+  // Axios 超时没有 HTTP 响应；先单独识别，避免误提示为用户网络断开。
+  if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+    throw new HttpError($t('httpMsg.requestTimeout'), ApiStatus.requestTimeout, {
+      url: requestConfig?.url,
+      method: requestConfig?.method?.toUpperCase()
+    })
+  }
+
   // 处理网络错误
   if (!error.response) {
     throw new HttpError($t('httpMsg.networkError'), ApiStatus.error, {
@@ -146,7 +154,8 @@ export function handleError(error: AxiosError<unknown>): never {
 
   // 处理 HTTP 状态码错误
   // 项目后端只返回已定义的业务错误消息；非契约响应仍按 HTTP 状态给出通用提示。
-  const message = contractError?.message || (statusCode ? getErrorMessage(statusCode) : error.message)
+  const message =
+    contractError?.message || (statusCode ? getErrorMessage(statusCode) : error.message)
   throw new HttpError(message, statusCode || ApiStatus.error, {
     data: responseData,
     businessCode: contractError?.code,

@@ -22,9 +22,20 @@ export const templateRoutes: AppRouteRecord = {
     {
       path: 'xhs-title/draft',
       name: 'XhsTitleDraft',
+      redirect: '/templates/XHS_TITLE/editor',
       component: '/templates/draft',
       meta: {
         title: 'menus.templates.xhsTitleDraft',
+        roles: ['R_SUPER', 'R_ADMIN'],
+        isHide: true
+      }
+    },
+    {
+      path: ':code/editor',
+      name: 'ManagedTemplateEditor',
+      component: '/templates/editor',
+      meta: {
+        title: 'menus.templates.editor',
         roles: ['R_SUPER', 'R_ADMIN'],
         isHide: true
       }

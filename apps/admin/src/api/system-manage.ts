@@ -1,12 +1,10 @@
 import request from '@/utils/http'
 import { AppRouteRecord } from '@/types/router'
+import { fetchAdminUserList } from './admin-users'
 
 // 获取用户列表
 export function fetchGetUserList(params: Api.SystemManage.UserSearchParams) {
-  return request.get<Api.SystemManage.UserList>({
-    url: '/api/user/list',
-    params
-  })
+  return fetchAdminUserList(params)
 }
 
 // 获取角色列表

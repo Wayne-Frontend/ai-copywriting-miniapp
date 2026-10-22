@@ -1,5 +1,6 @@
 import request from '@/utils/http'
 import type { AdminIdentity, AdminLoginRequest } from '../../../../packages/contracts/src/api'
+import { adminAvatar } from '@/utils/admin-avatar'
 
 function toUserInfo(admin: AdminIdentity): Api.Auth.UserInfo {
   // 模板菜单使用 R_SUPER/R_ADMIN；这里仅做显示层映射，权限仍由服务端校验。
@@ -14,7 +15,8 @@ function toUserInfo(admin: AdminIdentity): Api.Auth.UserInfo {
     userName: admin.username,
     roles: [role],
     buttons: [],
-    email: ''
+    email: admin.email ?? '',
+    avatar: adminAvatar(admin.avatarKey)
   }
 }
 

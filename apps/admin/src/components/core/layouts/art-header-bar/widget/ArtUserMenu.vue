@@ -14,7 +14,7 @@
     <template #reference>
       <img
         class="size-8.5 mr-5 c-p rounded-full max-sm:w-6.5 max-sm:h-6.5 max-sm:mr-[16px]"
-        src="@imgs/user/avatar.webp"
+        :src="userInfo.avatar"
         alt="avatar"
       />
     </template>
@@ -23,7 +23,7 @@
         <div class="flex-c pb-1 px-0">
           <img
             class="w-10 h-10 mr-3 ml-0 overflow-hidden rounded-full float-left"
-            src="@imgs/user/avatar.webp"
+            :src="userInfo.avatar"
           />
           <div class="w-[calc(100%-60px)] h-full">
             <span class="block text-sm font-medium text-g-800 truncate">{{
@@ -33,6 +33,10 @@
           </div>
         </div>
         <ul class="py-4 mt-3 border-t border-g-300/80">
+          <li class="btn-item" @click="openProfile">
+            <ArtSvgIcon icon="ri:user-settings-line" />
+            <span>个人中心</span>
+          </li>
           <li class="btn-item" @click="lockScreen()">
             <ArtSvgIcon icon="ri:lock-line" />
             <span>{{ $t('topBar.user.lockScreen') }}</span>
@@ -52,14 +56,20 @@
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { useUserStore } from '@/store/modules/user'
   import { mittBus } from '@/utils/sys'
+  import { useRouter } from 'vue-router'
 
   defineOptions({ name: 'ArtUserMenu' })
 
   const { t } = useI18n()
   const userStore = useUserStore()
+  const router = useRouter()
 
   const { getUserInfo: userInfo } = storeToRefs(userStore)
   const userMenuPopover = ref()
+  const openProfile = () => {
+    closeUserMenu()
+    router.push('/system/user-center')
+  }
 
   /**
    * 打开锁屏功能

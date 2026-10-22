@@ -92,7 +92,7 @@ declare namespace Api {
 
     /** 用户列表项 */
     interface UserListItem {
-      id: number
+      id: string
       avatar: string
       status: string
       userName: string
@@ -109,8 +109,10 @@ declare namespace Api {
 
     /** 用户搜索参数 */
     type UserSearchParams = Partial<
-      Pick<UserListItem, 'id' | 'userName' | 'userGender' | 'userPhone' | 'userEmail' | 'status'> &
-        Api.Common.CommonSearchParams
+      Pick<
+        UserListItem,
+        'id' | 'userName' | 'userGender' | 'userPhone' | 'userEmail' | 'status'
+      > & { role?: 'super_admin' | 'operator' } & Api.Common.CommonSearchParams
     >
 
     /** 角色列表 */

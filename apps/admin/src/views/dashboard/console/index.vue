@@ -1,23 +1,17 @@
 <template>
-  <div class="space-y-5">
-    <section class="art-card-sm relative overflow-hidden p-7 md:p-9">
-      <div
-        class="absolute -right-12 -top-16 size-56 rounded-full bg-theme/10 blur-3xl"
-        aria-hidden="true"
-      ></div>
-      <div class="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+  <div class="space-y-4 md:space-y-5">
+    <section class="art-card-sm p-5 md:p-6">
+      <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p class="mb-3 text-sm font-medium text-theme">{{ $t('dashboardHome.eyebrow') }}</p>
-          <h1 class="text-2xl font-semibold text-g-900 md:text-3xl">
+          <p class="mb-2 text-sm font-medium text-theme">{{ $t('dashboardHome.eyebrow') }}</p>
+          <h1 class="text-xl font-semibold text-g-900 md:text-2xl">
             {{ $t('dashboardHome.welcome', { username }) }}
           </h1>
-          <p class="mt-3 max-w-2xl text-sm leading-6 text-g-600">
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-g-600">
             {{ $t('dashboardHome.intro') }}
           </p>
         </div>
-        <div
-          class="flex shrink-0 items-center gap-3 rounded-xl border border-g-300/70 bg-box px-4 py-3"
-        >
+        <div class="flex shrink-0 items-center gap-3 rounded-lg bg-g-100 px-4 py-3">
           <div
             class="flex size-10 items-center justify-center rounded-full bg-theme/10 text-lg font-semibold text-theme"
           >
@@ -31,9 +25,9 @@
       </div>
     </section>
 
-    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-      <section class="art-card-sm p-6 md:p-7">
-        <div class="mb-5 flex items-center gap-3">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
+      <section class="art-card-sm p-5 md:p-6">
+        <div class="mb-4 flex items-center gap-3">
           <div class="flex size-10 items-center justify-center rounded-xl bg-theme/10 text-theme">
             <ArtSvgIcon icon="ri:shield-check-line" class="text-xl" />
           </div>
@@ -56,8 +50,8 @@
         </ul>
       </section>
 
-      <section class="art-card-sm p-6 md:p-7">
-        <div class="mb-5 flex items-center gap-3">
+      <section class="art-card-sm p-5 md:p-6">
+        <div class="mb-4 flex items-center gap-3">
           <div class="flex size-10 items-center justify-center rounded-xl bg-g-200 text-g-700">
             <ArtSvgIcon icon="ri:time-line" class="text-xl" />
           </div>
@@ -81,9 +75,7 @@
       </section>
     </div>
 
-    <div
-      class="flex items-start gap-3 rounded-xl border border-g-300/70 bg-box px-5 py-4 text-sm leading-6 text-g-700"
-    >
+    <div class="art-card-sm flex items-start gap-3 px-5 py-4 text-sm leading-6 text-g-700">
       <ArtSvgIcon icon="ri:information-line" class="mt-0.5 shrink-0 text-lg text-theme" />
       <span>{{ $t('dashboardHome.exampleNotice') }}</span>
     </div>
